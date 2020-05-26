@@ -23,8 +23,6 @@ import logging
 import time
 import datetime
 import codecs
-import tkinter
-from tkinter.filedialog import *
 import statistics
 import pandas as pad 
 from openpyxl import load_workbook
@@ -34,13 +32,26 @@ import shutil
 
 date = datetime.datetime.now()
 
-def Dynalogs_Leaf_GAP_analyser(filepath):
 
-    ### Get treatment date and RapidArc number with the name of the dynalog file ###
+
+
+def dynalogs_BRAS_Gantry_analyser(filepath):
+
+
+def dynalogs_BRAS_UM_analyser(filepath):
+
+
+
+
+
+def dynalogs_SPEED_UM_analyser(filepath):
+   ### Get treatment date and RapidArc number with the name of the dynalog file ###
     LenghtFilePath = len(filepath)
     AcquisitionDate = filepath[LenghtFilePath-38:LenghtFilePath-30]
     AcquisitionDateExcel = str(AcquisitionDate[6:]) + "/" + str(AcquisitionDate[4:6]) + "/" + str(AcquisitionDate[:4])
     Banc = filepath[LenghtFilePath-39]
+    
+
     NumeroRapid =  filepath[LenghtFilePath-14:LenghtFilePath-13]
     MachineName = "RapidArc_iX_" + str(NumeroRapid)
 
@@ -232,10 +243,8 @@ def Dynalogs_Leaf_GAP_analyser(filepath):
     return (ListOfResults)
 
 
-def ExportToExcel(ListOfResultsBrasGantry, ListOfResultsBrasUM, ListOfResultsSpeedUM):
-    """
-    Will export the results into a excel file with one excel file per RapidArc machine
-    """
+def export_to_excel(ListOfResultsBrasGantry, ListOfResultsBrasUM, ListOfResultsSpeedUM):
+    """ Export the results into a excel file with one excel file per RapidArc machine"""
     
     MachineName = str(ListOfResultsBrasGantry[0])
     ListOfResultsBrasGantry = [ListOfResultsBrasGantry[1:]]
@@ -312,47 +321,66 @@ def ExportToExcel(ListOfResultsBrasGantry, ListOfResultsBrasUM, ListOfResultsSpe
 
 #########                               12th Mars update                                   ###########
 #########                            loop to analyse all the files in the folder           ###########
-fileList = []
-for f in Path('Z:/Aurelien_Dynalogs/0000_Fichiers_Dynalogs_A_Analyser/PFRTOTAT_TOP').walkfiles(): 
-    fileList.append(f)
+def get_files_list(path):
+    """Get the name of the dynalog files which are present in the folders of interest"""
 
-newFileList = []
-lastFileList = []
-for i in range(len(fileList)):
-    newFileList.append(fileList[i].replace('Path(',''))
-    lastFileList.append(newFileList[i].replace('\\','/'))
-    i += 1
-
-dynalogFileList = lastFileList
-
-print("\n\nIl y a " + str(len(dynalogFileList)) + " fichiers dynalogs à analyser")
-
-if len(dynalogFileList) != 0:
-    print("\n\nLancement du programme d'analyse\n\n")
-    for i in range(int(len(dynalogFileList)/2)):
-        ListOfResultsA = Dynalogs_Leaf_GAP_analyser(str(dynalogFileList[i]))
-        ListOfResultsB = Dynalogs_Leaf_GAP_analyser(str(dynalogFileList[i+int(len(dynalogFileList)/2)]))
-        ExportToExcel(ListOfResultsA, ListOfResultsB)
+    fileList = []
+    for f in Path(path).walkfiles(): 
+        fileList.append(f)
+    
+    newFileList = []
+    lastFileList = []
+    for i in range(len(fileList)):
+        newFileList.append(fileList[i].replace('Path(',''))
+        lastFileList.append(newFileList[i].replace('\\','/'))
         i += 1
 
-    print("\n\nANALYSE TERMINEE\n\n")
-    
-    #### Déplacement des fichiers dynalogs analysés dans un répertoire d'archive ###
-    for file in dynalogFileList:
-        shutil.move(file, 'Z:/Aurelien_Dynalogs/Results_Analyses_Dynalogs/LEAF_GAP_PFROTAT/Archives')
+    dynalogFileList = lastFileList
 
-    ### Annonce des résultats de l'analyse ###
-    Results_Dynalogs_Analysis = str(ListOfResultsA[5])
-    if Results_Dynalogs_Analysis == "Hors tolérance":
-        print("\n\nRESULTATS NON CONFORMES\n\n")
-        MachineName = str(ListOfResultsA[0])
-        if MachineName == "RapidArc_iX_1":
-            os.startfile("//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/7_CLINAC iX 1/7-3 CQ -EN/7-1 CQ_quotidien/CQ quotidien Dynalog PFROTAT - iX1.xlsm")
-            os.system("pause")
-        else:
-            os.startfile("//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/10_CLINAC iX 2/10-3 CQ -EN/10-1 CQ_quotidien/CQ quotidien Dynalog PFROTAT - iX2.xlsm")
-            os.system("pause")
-    else:
-        print("\n\nRESULTATS CONFORMES\n\n")
-        os.system("pause")
+    print("\n\nIl y a " + str(len(dynalogFileList)) + " fichiers dynalogs à analyser dans le dossier : " + str(path)"\n\n")
+
+    return (dynalogFileList)
+
+dynalogFileList_BrasGantry = get_files_list("CHEMIN POUR BRAS GANTRY")
+dynalogFileList_BrasUM = get_files_list("CHEMIN POUR BRAS UM")
+dynalogFileList_SpeedUM = get_files_list("CHEMIN POUR Speed-UM")
+
+### Test if dynalogs files are present in the folder and then lunch the main functions ###
+if len(dynalogFileList_BrasGantry) != 0:
+    print("\n\nLancement du programme d'analyse du module BRAS Gantry\n\n")
+    for i in range(int(len(dynalogFileList_BrasGantry)/2)):
+        ListOfResultsBrasGantry = dynalogs_BRAS_Gantry_analyser(str(dynalogFileList_BrasGantry[i]))
+        i += 1
+    print("\n\nANALYSE DU MODULE BRAS GANTRY TERMINEE\n\n")
+    for file in dynalogFileList_BrasGantry:
+        shutil.move(file, 'Z:/Aurelien_Dynalogs/Results_Analyses_Dynalogs/LEAF_GAP_PFROTAT/Archives') ###CHANGER METTRE BON CHEMIN ###
+
+if len(dynalogFileList_BrasUM) != 0:
+    print("\n\nLancement du programme d'analyse du module BRAS Gantry\n\n")
+    for i in range(int(len(dynalogFileList_BrasUM)/2)):
+        ListOfResultsBrasUM = dynalogs_BRAS_UM_analyser(str(dynalogFileList_BrasUM[i]))
+        i += 1
+    print("\n\nANALYSE DU MODULE BRAS UM TERMINEE\n\n")
+    for file in dynalogFileList_BrasUM:
+        shutil.move(file, 'Z:/Aurelien_Dynalogs/Results_Analyses_Dynalogs/LEAF_GAP_PFROTAT/Archives') ###CHANGER METTRE BON CHEMIN ###
+
+if len(dynalogFileList_SpeedUM) != 0:
+    print("\n\nLancement du programme d'analyse du module BRAS Gantry\n\n")
+    for i in range(int(len(dynalogFileList_SpeedUM)/2)):
+        ListOfResultsSpeedUM = dynalogs_SPEED_UM_analyser(str(dynalogFileList_SpeedUM[i]))
+        i += 1
+    print("\n\nANALYSE DU MODULE SPEED UM TERMINEE\n\n")
+    for file in dynalogFileList_SpeedUM:
+        shutil.move(file, 'Z:/Aurelien_Dynalogs/Results_Analyses_Dynalogs/LEAF_GAP_PFROTAT/Archives') ###CHANGER METTRE BON CHEMIN ###
+
+
+### Export the results of the three analyse into the excel file ###
+export_to_excel(ListOfResultsBrasGantry, ListOfResultsBrasUM, ListOfResultsSpeedUM)
+
+
+### Open the excel file with the results and announced the end of the program ###
+os.startfile("//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/10_CLINAC iX 2/10-3 CQ -EN/10-1 CQ_quotidien/CQ quotidien Dynalog PFROTAT - iX2.xlsm")
+os.startfile("//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/10_CLINAC iX 2/10-3 CQ -EN/10-1 CQ_quotidien/CQ quotidien Dynalog PFROTAT - iX2.xlsm")
+print("\n\nFIN DU PROGRAMME D'ANALYSE\n\n")
+os.system("pause")
 
