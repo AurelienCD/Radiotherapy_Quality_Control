@@ -10,11 +10,6 @@
 # Update 22/05/2020 : fit to the new excel files (one per RapidArc), change the theshold value for conformity (based on the previous 6 months results, using mean+1.96SD)
 
 
-import importlib
-import os, string
-import unittest
-import logging
-import time
 import datetime
 import codecs
 import statistics
@@ -23,6 +18,7 @@ from openpyxl import load_workbook
 import win32com.client
 from path import Path
 import shutil
+import os
 
 date = datetime.datetime.now()
 
@@ -88,12 +84,9 @@ def Dynalogs_Leaf_GAP_analyser(filepath):
         LeafGAP.append(abs(Difference))
 
     # détermination de la différence max entre position attendues et réelles et ceci pour le banc de lame A et/ou B sachant que les positions seront positives ou négatives en fonction du banc de lames
-    MinimumDifference = min(LeafGAP)
     MaximumDifference = max(LeafGAP)
 
     MaxDifference = MaximumDifference/100
-
-    LeafGAPIndex = LeafGAP.index(MaximumDifference) # donne l'indice où la différence est maximale, afin de retourner au n° de la lame
 
     #####création d'une table où les multiples des positions de lames sont présentes (dans le but de remonter au n° de lame défectueuse)
     TableLame = []
@@ -140,6 +133,7 @@ def Dynalogs_Leaf_GAP_analyser(filepath):
                 ResultLeafGAP = "Conforme"
             else:
                 ResultLeafGAP = "Hors tolérance"
+                ResultMaxDifference = "HT"
         else:
             if MaxDifference < 0.51 or MeanLeafGAPAllLeaf < 0.061:
                 ResultLeafGAP = "Conforme"
@@ -227,7 +221,7 @@ def Dynalogs_Leaf_GAP_analyser(filepath):
         LameNumber = ""
 
     ListOfResults = []
-    ListOfResults = [MachineName, str(AcquisitionDateExcel), str(MaxDifference), str(MeanLeafGAPAllLeaf), str(SDLeafGAPAllLeaf), str(ResultLeafGAP), str(LameNumber)]
+    ListOfResults = [MachineName, str(AcquisitionDateExcel), MaxDifference, str(LameNumber), MeanLeafGAPAllLeaf, SDLeafGAPAllLeaf, str(ResultLeafGAP)]
     
     return (ListOfResults)
 
@@ -240,27 +234,27 @@ def Dynalogs_Leaf_GAP_analyser(filepath):
 def ExportToExcel(ListOfResultsA, ListOfResultsB):
     MachineName = str(ListOfResultsA[0])
     #Results_Analyses_Dynalogs = str(ListOfResultsA[5])
-    ListOfResultsToExcel = [ListOfResultsA[1]]
     #ListOfResultsA = ListOfResultsA[2:5]
     #ListOfResultsB = ListOfResultsB[2:5]
-    ListOfResultsToExcel = [ListOfResultsToExcel+ListOfResultsA[2:5]+ListOfResultsA[6]+ListOfResultsB[2:5]+ListOfResultsB[6]]
+    ListOfResultsToExcel = ListOfResultsA[1:6]+ListOfResultsB[2:6]
+    #ListOfResultsToExcel = [x.replace('.', ',') for x in ListOfResultsToExcel]
     #df = pad.DataFrame(ListOfResultsToExcel)
     if MachineName == "RapidArc_iX_1":
         book = load_workbook('//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/7_CLINAC iX 1/7-3 CQ -EN/7-1 CQ_quotidien/CQ quotidien Dynalog PFROTAT - iX1.xlsm', read_only=False, keep_vba=True)
         writer = pad.ExcelWriter('//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/7_CLINAC iX 1/7-3 CQ -EN/7-1 CQ_quotidien/CQ quotidien Dynalog PFROTAT - iX1.xlsm', engine='openpyxl') 
         writer.book = book
         writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
-        #df.to_excel(writer, "Dynalog_PFROTAT_iX1",startrow=9, startcol=0, header=False, index=False) ########### CHANGER NUMERO DES CASES AVEC NOUVEAU FICHIER !!!! et ajouter le résultat ############
+        #df.to_excel(writer, "Dynalog_PFROTAT_iX1",startrow=9, startcol=0, header=False, index=False)
         ws = writer.sheets['Dynalog_PFROTAT_iX1']
-        ws["F18"] = ListOfResultsToExcel[0]
-        ws["G18"] = ListOfResultsToExcel[1]
-        ws["I18"] = ListOfResultsToExcel[2]
-        ws["K18"] = ListOfResultsToExcel[3]
-        ws["M18"] = ListOfResultsToExcel[4]
-        ws["N18"] = ListOfResultsToExcel[5]
-        ws["P18"] = ListOfResultsToExcel[6]
-        ws["R18"] = ListOfResultsToExcel[7]
-        ws["T18"] = ListOfResultsToExcel[8]
+        ws["F18"] = str(ListOfResultsToExcel[0])
+        ws["G18"] = float(ListOfResultsToExcel[1])
+        ws["I18"] = str(ListOfResultsToExcel[2])
+        ws["J18"] = float(ListOfResultsToExcel[3])
+        ws["L18"] = float(ListOfResultsToExcel[4])
+        ws["N18"] = float(ListOfResultsToExcel[5])
+        ws["P18"] = str(ListOfResultsToExcel[6])
+        ws["Q18"] = float(ListOfResultsToExcel[7])
+        ws["S18"] = float(ListOfResultsToExcel[8])
         writer.save()
         xl = win32com.client.Dispatch('Excel.Application')
         xl.Workbooks.Open(Filename = '//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/7_CLINAC iX 1/7-3 CQ -EN/7-1 CQ_quotidien/CQ quotidien Dynalog PFROTAT - iX1.xlsm', ReadOnly=1)  
@@ -271,24 +265,24 @@ def ExportToExcel(ListOfResultsA, ListOfResultsB):
         del xl
 
     else:
-        book = load_workbook('//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/10_CLINAC iX 2/10-3 CQ -EN/10-1 CQ_quotidien/CQ quotidien Dynalog PFROTAT - iX2.xlsm', read_only=False, keep_vba=True)
-        writer = pad.ExcelWriter('//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/10_CLINAC iX 2/10-3 CQ -EN/10-1 CQ_quotidien/CQ quotidien Dynalog PFROTAT - iX2.xlsm', engine='openpyxl') 
+        book = load_workbook('//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/10_CLINAC iX 2/10-3 CQ -EN/10-1_CQ_quotidien/CQ quotidien Dynalog PFROTAT - iX2.xlsm', read_only=False, keep_vba=True)
+        writer = pad.ExcelWriter('//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/10_CLINAC iX 2/10-3 CQ -EN/10-1_CQ_quotidien/CQ quotidien Dynalog PFROTAT - iX2.xlsm', engine='openpyxl') 
         writer.book = book
         writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
-        #df.to_excel(writer, "Dynalog_PFROTAT_iX2",startrow=9, startcol=0, header=False, index=False) ########### CHANGER NUMERO DES CASES AVEC NOUVEAU FICHIER !!!! ############
+        #df.to_excel(writer, "Dynalog_PFROTAT_iX2",startrow=9, startcol=0, header=False, index=False)
         ws = writer.sheets['Dynalog_PFROTAT_iX2']
-        ws["F18"] = ListOfResultsToExcel[0]
-        ws["G18"] = ListOfResultsToExcel[1]
-        ws["I18"] = ListOfResultsToExcel[2]
-        ws["K18"] = ListOfResultsToExcel[3]
-        ws["M18"] = ListOfResultsToExcel[4]
-        ws["N18"] = ListOfResultsToExcel[5]
-        ws["P18"] = ListOfResultsToExcel[6]
-        ws["R18"] = ListOfResultsToExcel[7]
-        ws["T18"] = ListOfResultsToExcel[8]  
+        ws["F18"] = str(ListOfResultsToExcel[0])
+        ws["G18"] = float(ListOfResultsToExcel[1])
+        ws["I18"] = str(ListOfResultsToExcel[2])
+        ws["J18"] = float(ListOfResultsToExcel[3])
+        ws["L18"] = float(ListOfResultsToExcel[4])
+        ws["N18"] = float(ListOfResultsToExcel[5])
+        ws["P18"] = str(ListOfResultsToExcel[6])
+        ws["Q18"] = float(ListOfResultsToExcel[7])
+        ws["S18"] = float(ListOfResultsToExcel[8])
         writer.save()
         xl = win32com.client.Dispatch('Excel.Application')
-        xl.Workbooks.Open(Filename = '//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/10_CLINAC iX 2/10-3 CQ -EN/10-1 CQ_quotidien/CQ quotidien Dynalog PFROTAT - iX2.xlsm', ReadOnly=1)  
+        xl.Workbooks.Open(Filename = '//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/10_CLINAC iX 2/10-3 CQ -EN/10-1_CQ_quotidien/CQ quotidien Dynalog PFROTAT - iX2.xlsm', ReadOnly=1)  
         xl.Worksheets("Dynalog_PFROTAT_iX2").Activate()
         #ws = xl.ActiveSheet ############# ne sert à rien pour moi mais à tester si bug 
         xl.Application.Run("ArchiverDynalog_PROTAT_iX2")
@@ -321,25 +315,24 @@ if len(dynalogFileList) != 0:
         ListOfResultsB = Dynalogs_Leaf_GAP_analyser(str(dynalogFileList[i+int(len(dynalogFileList)/2)]))
         ExportToExcel(ListOfResultsA, ListOfResultsB)
         i += 1
-
-    print("\n\nANALYSE TERMINEE\n\n")
     
+    print("\n\nANALYSE TERMINEE\n\n")
     #### Déplacement des fichiers dynalogs analysés dans un répertoire d'archive ###
     for file in dynalogFileList:
         shutil.move(file, 'Z:/Aurelien_Dynalogs/Results_Analyses_Dynalogs/LEAF_GAP_PFROTAT/Archives')
 
     ### Annonce des résultats de l'analyse ###
-    Results_Dynalogs_Analysis = str(ListOfResultsA[5])
-    if Results_Dynalogs_Analysis == "Hors tolérance":
+    Results_Dynalogs_AnalysisA = str(ListOfResultsA[6])
+    Results_Dynalogs_AnalysisB = str(ListOfResultsB[6])
+    if Results_Dynalogs_AnalysisA == "Hors tolérance" or Results_Dynalogs_AnalysisB == "Hors tolérance":
         print("\n\nRESULTATS NON CONFORMES\n\n")
         MachineName = str(ListOfResultsA[0])
         if MachineName == "RapidArc_iX_1":
-            os.startfile("//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/7_CLINAC iX 1/7-3 CQ -EN/7-1 CQ_quotidien/CQ quotidien Dynalog PFROTAT - iX1.xlsm")
+            os.startfile('\\\\s-grp\\grp\\RADIOPHY\\Contrôle Qualité RTE\\Contrôle Qualité RTE-accélérateurs\\7_CLINAC iX 1\\7-3 CQ -EN\\7-1 CQ_quotidien\\CQ quotidien Dynalog PFROTAT - iX1.xlsm')
             os.system("pause")
         else:
-            os.startfile("//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/10_CLINAC iX 2/10-3 CQ -EN/10-1 CQ_quotidien/CQ quotidien Dynalog PFROTAT - iX2.xlsm")
+            os.startfile('\\\\s-grp\\grp\\RADIOPHY\\Contrôle Qualité RTE\\Contrôle Qualité RTE-accélérateurs\\10_CLINAC iX 2\\10-3 CQ -EN\\10-1_CQ_quotidien\\CQ quotidien Dynalog PFROTAT - iX2.xlsm')
             os.system("pause")
     else:
         print("\n\nRESULTATS CONFORMES\n\n")
         os.system("pause")
-
