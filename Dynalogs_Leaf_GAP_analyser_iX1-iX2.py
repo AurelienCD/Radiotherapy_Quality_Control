@@ -212,6 +212,27 @@ def Dynalogs_Leaf_GAP_analyser(filepath):
     filesave.write("\n\n")
     filesave.close()
     
+    ### For Dynalogs_Leaf_GAP_Watcher program, need 0 or 1 in text file to give the information to Solène and Cindy about the result of the analysis ###
+    ### (strange approach due to the fact that they do not have python libraries) ###
+    if ResultLeafGAP == "Hors tolérance":
+        if MachineName == "RapidArc_iX_1":
+            filesave = open("Z:/Aurelien_Dynalogs/Results_Analyses_Dynalogs/LEAF_GAP_PFROTAT/Results_iX1_iX2/temp_results_R1.txt", 'w')
+            filesave.write("1")
+            filesave.close()
+        elif MachineName == "RapidArc_iX_2":
+            filesave = open("Z:/Aurelien_Dynalogs/Results_Analyses_Dynalogs/LEAF_GAP_PFROTAT/Results_iX1_iX2/temp_results_R2.txt", 'w')
+            filesave.write("1")
+            filesave.close()
+
+    else:
+        filesaveR1 = open("Z:/Aurelien_Dynalogs/Results_Analyses_Dynalogs/LEAF_GAP_PFROTAT/Results_iX1_iX2/temp_results_R1.txt", 'w')
+        filesaveR2 = open("Z:/Aurelien_Dynalogs/Results_Analyses_Dynalogs/LEAF_GAP_PFROTAT/Results_iX1_iX2/temp_results_R2.txt", 'w')
+        filesaveR1.write("0")
+        filesaveR2.write("0")
+        filesaveR1.close()
+        filesaveR2.close()
+
+    ### To know the number of leaf which is in trouble ###
     if ResultLeafGAP == "Hors tolérance":
         if Banc == "A":
             LameNumber = "A" + str(LameNumber)
@@ -324,6 +345,7 @@ if len(dynalogFileList) != 0:
     ### Annonce des résultats de l'analyse ###
     Results_Dynalogs_AnalysisA = str(ListOfResultsA[6])
     Results_Dynalogs_AnalysisB = str(ListOfResultsB[6])
+
     if Results_Dynalogs_AnalysisA == "Hors tolérance" or Results_Dynalogs_AnalysisB == "Hors tolérance":
         print("\n\nRESULTATS NON CONFORMES\n\n")
         MachineName = str(ListOfResultsA[0])
