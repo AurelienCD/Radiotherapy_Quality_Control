@@ -8,7 +8,7 @@
 # Update 09/03/2020 : ask for new measurement   
 # Update 12/03/2020 : will look at the folder in "Z:/qualité" and performed automatically the analysis to all the dynalogs files present in the folder, it will also copy all the results in the excel file and activate VBA macro to archive the results
 # Update 22/05/2020 : fit to the new excel files (one per RapidArc), change the theshold value for conformity (based on the previous 6 months results, using mean+1.96SD)
-
+# Update 04/06/2020 : transfert the dynalog files into the correct folders (the one for patient and the other on for PFRTOAT, will delete others)
 
 import datetime
 import codecs
@@ -310,6 +310,39 @@ def ExportToExcel(ListOfResultsA, ListOfResultsB):
         xl.Application.Quit()
         del xl
   
+
+
+#########                               04th June update                                   ###########
+#########            transfert the dynalog files into the correct folders                  ###########
+#########   (the one for patient and the other on for PFRTOAT, will delete others)         ###########
+
+
+PFRot_File_List = []
+Patient_File_List = []
+for elm in fileList:
+    if elm[94:] == "PF ROTAT.dlg":
+        PFRot_File_List.append(elm)
+    else:
+        Patient_File_List.append(elm)
+
+TruePatient_File_List = []
+Bin_File_List = []
+for elm in Patient_File_List:
+    try:
+        float(elm[68:75]) > 10
+        TruePatient_File_List.append(elm)
+    except:
+        Bin_File_List.append(elm)
+
+for file in PFRot_File_List:
+    shutil.move(file, 'Z:/Aurelien_Dynalogs/0000_Fichiers_Dynalogs_A_Analyser/PFRTOTAT_TOP')
+
+for file in TruePatient_File_List:
+    shutil.move(file, 'Z:/Aurelien_Dynalogs/0000_Fichiers_Dynalogs_A_Analyser/Patients traités')
+
+for elm in Bin_File_List:
+    os.remove(elm)
+
 
 
 #########                               12th Mars update                                   ###########
