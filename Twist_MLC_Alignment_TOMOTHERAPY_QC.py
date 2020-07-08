@@ -210,8 +210,7 @@ class Twist_MLC_Alignment_TOMOTHERAPY_QCLogic(ScriptedLoadableModuleLogic):
     ListXaxisCenterOfBlock = [0,0,0] # initialisation de la liste contenant les valeurs Y centrales des blocs
 
     # Boucle de calcul des centres pour les 7 blocs (segment)
-    i = 0
-    while i < len(Segment_Name): 
+    for i in range(len(Segment_Name)): 
        n = slicer.util.getNode(Segmentation_Name)
        s = n.GetSegmentation()
        ss = s.GetSegment(Segment_Name[i])
@@ -219,20 +218,18 @@ class Twist_MLC_Alignment_TOMOTHERAPY_QCLogic(ScriptedLoadableModuleLogic):
        com = vtk.vtkCenterOfMass()
        com.SetInputData(pd)
        com.Update()
-       com.GetCenter() # A voir mais je pense que cette ligne est inutile
        CenterOfBlock = com.GetCenter() # CenterOfBlock est alors un tuple avec plusieurs variables (coordonées x,y,z)
        XaxisCenterOfBlock = (CenterOfBlock[0]) # Sélection de la 1ème valeur du tuple (indice 0) qui est la valeur dans l'axe X qui est l'unique valeur d'intérêt
        XaxisCenterOfBlock = abs(XaxisCenterOfBlock) # On passe en valeur absolue
        ListXaxisCenterOfBlock[i] = XaxisCenterOfBlock
-       i += 1
 
     logging.info("X coordinates of the centre of blocks : " + str(ListXaxisCenterOfBlock))
 
 
     ######### Calcul de la distance en X entre les centres des différents blocs###########
     
-    D1 = ListXaxisCenterOfBlock[1]-ListXaxisCenterOfBlock[2] # On récupère la distance entre le centre du bloc gauche et celui du milieu
-    D2 = ListXaxisCenterOfBlock[0]-ListXaxisCenterOfBlock[1] # On récupère la distance entre le centre du bloc droit et celui du milieu
+    D1 = abs(ListXaxisCenterOfBlock[1]-ListXaxisCenterOfBlock[2]) # On récupère la distance entre le centre du bloc gauche et celui du milieu
+    D2 = abs(ListXaxisCenterOfBlock[0]-ListXaxisCenterOfBlock[2]) # On récupère la distance entre le centre du bloc droit et celui du milieu
     Offset = D1 - D2
     OffsetInMm = Offset / 2 # Calcul de l'Offset qui est dans la réglementation
     logging.info("Offset in mm : " + str(OffsetInMm))
