@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-# Analyse des dynalogs CQ mensuel du module Bras et MLC SPEED des R1-R2 : 
+# Analyse des dynalogs CQ mensuel du module Bras et MLC SPEED des RapidArc 1 et 2 : 
 # => Evaluation de la différence entre la valeur attendue et réelle de 3 paramètres : 1) Position du bras, 2) Vitesse de rotation et 3) Débit de dose
 # Auteur : Aurélien Corroyer-Dulmont
 # Version : 13 Juillet 2020
@@ -23,7 +23,7 @@ import win32com.client
 
 
 def Dynalogs_BRAS_Gantry_analyser(filepath):
-	"""Fonction permettant d'obtenir la position du gantry toute les 50ms (point de contrôle dynalogs) et pour les points d'index (tout les 750ms)"""
+	"""Fonction permettant d'obtenir la position du gantry toute les 50ms (point de contrôle dynalogs) et pour les points d'index"""
 
 	### Analyse the number of line which is different from dynalog file from an other ###
 	file = open(filepath, 'r')
@@ -111,8 +111,8 @@ def Dynalogs_BRAS_Gantry_analyser(filepath):
 	return Result
 
 
-def Dynalogs_BRAS_UM_analyser(filepath):   #### A ADAPTER CAR MAINTENANT IL FAUT ECART DE DEBIT ET MAX ###
-	"""Fonction permettant d'obtenir le débit de dose à partir des valeurs de fraction de dose relative du dynalogs"""
+def Dynalogs_BRAS_UM_analyser(filepath):
+	"""Fonction permettant d'obtenir le débit de dose à partir des valeurs de fraction de dose relative du dynalogs pour le module BRAS"""
 
 
 	### Analyse the number of line which is different from dynalog file from an other ###
@@ -211,7 +211,7 @@ def Dynalogs_BRAS_UM_analyser(filepath):   #### A ADAPTER CAR MAINTENANT IL FAUT
 
 
 def Dynalogs_MLCSPEED_UM_analyser(filepath):
-	"""Fonction permettant d'obtenir le débit de dose à partir des valeurs de fraction de dose relative du dynalogs"""
+	"""Fonction permettant d'obtenir le débit de dose à partir des valeurs de fraction de dose relative du dynalogs pour le module MLC SPEED"""
 
 
 	### Analyse the number of line which is different from dynalog file from an other ###
