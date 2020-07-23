@@ -42,8 +42,8 @@ def Dynalogs_Leaf_GAP_analyser(RapidName, filepath):
 	LineCount = 0
 
 	while (not LineNotEmpty) != True:
-	   LineNotEmpty = file.readlines(1)
-	   LineCount += 1
+		LineNotEmpty = file.readlines(1)
+		LineCount += 1
 
 	LineCount -= 1 # because the loop goes at the end + 1 line
 	LineCount -= 6 # six first line are information on ARC not dynalog measure
@@ -156,7 +156,7 @@ def Dynalogs_Leaf_GAP_analyser(RapidName, filepath):
 			print("Ecart maximal / moyen / SD pour la lame n°" + str(i+1) + ": " + str(MaxLeafGAP[i]/100) + " / " + str(MeanLeafGAP[i]) + " / " + str(SDLeafGAP[i]) + " mm")
 
 
-	print("\n")             
+	print("\n")
 	print(u"Le résultat du test est : " + str(ResultLeafGAP.upper()) +"\n\n")
 	print(u"L'ensemble des résultats sont dans le dossier : \n" + str(savepath) +"\n\n")
 	
@@ -167,7 +167,7 @@ def Dynalogs_Leaf_GAP_analyser(RapidName, filepath):
 	filesave.write("\n\n")
 	filesave.write("ID Patient : " + str(IDPatient))
 	filesave.write("\n\n")
-	filesave.write("ID Patient : " + str(MachineName))
+	filesave.write("Nom machine : " + str(MachineName))
 	filesave.write("\n\n")
 	filesave.write("Date d'acquisition : " + str(AcquisitionDate[6:]) + "/" + str(AcquisitionDate[4:6]) + "/" + str(AcquisitionDate[:4]))
 	filesave.write("\n\n")
@@ -190,35 +190,12 @@ def Dynalogs_Leaf_GAP_analyser(RapidName, filepath):
 
 	i = 0
 	for i in range(len(MaxLeafGAP)):
-	  filesave.write("Ecart maximal / moyen / SD pour la lame n°" + str(i+1) + ": " + str(MaxLeafGAP[i]/100) + " / " + str(MeanLeafGAP[i]) + " / " + str(SDLeafGAP[i]) + " mm")
-	  filesave.write("\n")  
+		filesave.write("Ecart maximal / moyen / SD pour la lame n°" + str(i+1) + ": " + str(MaxLeafGAP[i]/100) + " / " + str(MeanLeafGAP[i]) + " / " + str(SDLeafGAP[i]) + " mm")
+		filesave.write("\n")  
 
 	filesave.write("\n\n")
 	filesave.close()
 	
-	
-	""" ### Need proper tolerance thershold ###
-	### For Dynalogs_Leaf_GAP_Watcher program, need 0 or 1 in text file to give the information to Solène and Cindy about the result of the analysis ###
-	### (strange approach due to the fact that they do not have python libraries) ###
-	if ResultLeafGAP == "Hors tolérance":
-		if MachineName == "RapidArc_iX_1":
-			filesave = open("Z:/Aurelien_Dynalogs/Results_Analyses_Dynalogs/LEAF_GAP_PFROTAT/Results_iX1_iX2/temp_results_R1.txt", 'w')
-			filesave.write("1")
-			filesave.close()
-		elif MachineName == "RapidArc_iX_2":
-			filesave = open("Z:/Aurelien_Dynalogs/Results_Analyses_Dynalogs/LEAF_GAP_PFROTAT/Results_iX1_iX2/temp_results_R2.txt", 'w')
-			filesave.write("1")
-			filesave.close()
-
-	else:
-		filesaveR1 = open("Z:/Aurelien_Dynalogs/Results_Analyses_Dynalogs/LEAF_GAP_PFROTAT/Results_iX1_iX2/temp_results_R1.txt", 'w')
-		filesaveR2 = open("Z:/Aurelien_Dynalogs/Results_Analyses_Dynalogs/LEAF_GAP_PFROTAT/Results_iX1_iX2/temp_results_R2.txt", 'w')
-		filesaveR1.write("0")
-		filesaveR2.write("0")
-		filesaveR1.close()
-		filesaveR2.close()
-	"""
-
 	### To know the number of leaf which is in trouble ###
 	if ResultLeafGAP == "Hors tolérance":
 		if Banc == "A":
@@ -229,9 +206,38 @@ def Dynalogs_Leaf_GAP_analyser(RapidName, filepath):
 		LameNumber = ""
 
 	ListOfResults = []
-	ListOfResults = [IDPatient, str(AcquisitionDateExcel), MaxDifference, str(LameNumber), MeanLeafGAPAllLeaf, SDLeafGAPAllLeaf, str(ResultLeafGAP)]
+	ListOfResults = [int(IDPatient), str(AcquisitionDateExcel), MaxDifference, str(LameNumber), MeanLeafGAPAllLeaf, SDLeafGAPAllLeaf, str(ResultLeafGAP)]
 	
 	return (ListOfResults)
+
+
+def GetPatientInformation(IDPatient):
+	""" To obtain information about plan's name, localisation of the tumor and gamma index and mean values; information obtained from DELTA4 excel file """
+	
+	df = pad.read_excel('Z:/1_CQ Patients/CQ Patients DELTA4 iX1-iX2.xlsm', sheet_name='DQA PATIENTS iX', usecols="A:D,O,P", nrows=1000, header=2)
+	df = df.drop(0, axis=0)
+	df = df.drop(1, axis=0)
+	df = df.drop(2, axis=0)
+	df = df.dropna()
+
+	df_patient = df.loc[df["ID patient"]==IDPatient,:]
+	try:
+		plan_name = df_patient["Nom du plan de traitement"].array[0]
+		localisation = df_patient["Localisation"].array[0]
+	except:
+		plan_name = ""
+		localisation = ""
+	try:
+		gamma_index = df_patient["Gamma index"].array[0]
+		gamma_moyen = df_patient["Gamma moyen"].array[0]
+	except:
+		gamma_index = "NaN"
+		gamma_moyen = "NaN"
+
+	PatientInformation = []
+	PatientInformation = [int(IDPatient), plan_name, localisation, gamma_index, gamma_moyen]
+
+	return PatientInformation
 
 
 #########                               22th May 2020 update                                   ###########
@@ -239,8 +245,7 @@ def Dynalogs_Leaf_GAP_analyser(RapidName, filepath):
 
 #########                               9th Mars 2020 update                                   ###########
 ######### Create Pandas Excel functions to upload the results in the excel data base file ###########
-def ExportToExcel(MachineName, ListOfResultsA, ListOfResultsB):
-	IDPatient = str(ListOfResultsA[0])
+def ExportToExcel(MachineName, PatientInformation, ListOfResultsA, ListOfResultsB):
 	ListOfResultsToExcel = ListOfResultsA[1:6]+ListOfResultsB[2:6]
 	if MachineName == "RapidArc_iX_1":
 		book = load_workbook('//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/7_CLINAC iX 1/7-3 CQ -EN/7-1 CQ_quotidien/CQ quotidien Dynalog Patients_iX1.xlsm', read_only=False, keep_vba=True)
@@ -248,15 +253,20 @@ def ExportToExcel(MachineName, ListOfResultsA, ListOfResultsB):
 		writer.book = book
 		writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
 		ws = writer.sheets['Dynalog_Patient_iX1']
-		ws["F18"] = str(ListOfResultsToExcel[0])
-		ws["G18"] = float(ListOfResultsToExcel[1])
-		ws["I18"] = str(ListOfResultsToExcel[2])
-		ws["J18"] = float(ListOfResultsToExcel[3])
-		ws["L18"] = float(ListOfResultsToExcel[4])
-		ws["N18"] = float(ListOfResultsToExcel[5])
-		ws["P18"] = str(ListOfResultsToExcel[6])
-		ws["Q18"] = float(ListOfResultsToExcel[7])
-		ws["S18"] = float(ListOfResultsToExcel[8])
+		ws["D18"] = int(PatientInformation[0])
+		ws["E18"] = str(PatientInformation[1])
+		ws["F18"] = str(PatientInformation[2])
+		ws["G18"] = float(PatientInformation[3])
+		ws["H18"] = float(PatientInformation[4])
+		ws["I18"] = str(ListOfResultsToExcel[0])
+		ws["J18"] = float(ListOfResultsToExcel[1])
+		ws["L18"] = str(ListOfResultsToExcel[2])
+		ws["M18"] = float(ListOfResultsToExcel[3])
+		ws["O18"] = float(ListOfResultsToExcel[4])
+		ws["Q18"] = float(ListOfResultsToExcel[5])
+		ws["R18"] = str(ListOfResultsToExcel[6])
+		ws["T18"] = float(ListOfResultsToExcel[7])
+		ws["V18"] = float(ListOfResultsToExcel[8])
 		writer.save()
 		xl = win32com.client.Dispatch('Excel.Application')
 		xl.Workbooks.Open(Filename = '//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/7_CLINAC iX 1/7-3 CQ -EN/7-1 CQ_quotidien/CQ quotidien Dynalog Patients_iX1.xlsm', ReadOnly=1)  
@@ -271,15 +281,20 @@ def ExportToExcel(MachineName, ListOfResultsA, ListOfResultsB):
 		writer.book = book
 		writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
 		ws = writer.sheets['Dynalog_Patient_iX2']
-		ws["F18"] = str(ListOfResultsToExcel[0])
-		ws["G18"] = float(ListOfResultsToExcel[1])
-		ws["I18"] = str(ListOfResultsToExcel[2])
-		ws["J18"] = float(ListOfResultsToExcel[3])
-		ws["L18"] = float(ListOfResultsToExcel[4])
-		ws["N18"] = float(ListOfResultsToExcel[5])
-		ws["P18"] = str(ListOfResultsToExcel[6])
-		ws["Q18"] = float(ListOfResultsToExcel[7])
-		ws["S18"] = float(ListOfResultsToExcel[8])
+		ws["D18"] = int(PatientInformation[0])
+		ws["E18"] = str(PatientInformation[1])
+		ws["F18"] = str(PatientInformation[2])
+		ws["G18"] = float(PatientInformation[3])
+		ws["H18"] = float(PatientInformation[4])
+		ws["I18"] = str(ListOfResultsToExcel[0])
+		ws["J18"] = float(ListOfResultsToExcel[1])
+		ws["L18"] = str(ListOfResultsToExcel[2])
+		ws["M18"] = float(ListOfResultsToExcel[3])
+		ws["O18"] = float(ListOfResultsToExcel[4])
+		ws["Q18"] = float(ListOfResultsToExcel[5])
+		ws["R18"] = str(ListOfResultsToExcel[6])
+		ws["T18"] = float(ListOfResultsToExcel[7])
+		ws["V18"] = float(ListOfResultsToExcel[8])
 		writer.save()
 		xl = win32com.client.Dispatch('Excel.Application')
 		xl.Workbooks.Open(Filename = '//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/10_CLINAC iX 2/10-3 CQ -EN/10-1_CQ_quotidien/CQ quotidien Dynalog Patients_iX2.xlsm', ReadOnly=1)  
@@ -319,19 +334,20 @@ dynalogFileListR2 = lastFileList
 print("\n\nIl y a " + str(len(dynalogFileListR1)) + " fichiers dynalogs à analyser pour le RapidArc_iX1")
 print("\n\nIl y a " + str(len(dynalogFileListR2)) + " fichiers dynalogs à analyser pour le RapidArc_iX2")
 
-
 if len(dynalogFileListR1) != 0 or len(dynalogFileListR2) != 0:
 	print("\n\nLancement du programme d'analyse\n\n")
 	for i in range(int(len(dynalogFileListR1)/2)):
 		ListOfResultsA = Dynalogs_Leaf_GAP_analyser("RapidArc_iX_1", str(dynalogFileListR1[i]))
 		ListOfResultsB = Dynalogs_Leaf_GAP_analyser("RapidArc_iX_1", str(dynalogFileListR1[i+int(len(dynalogFileListR1)/2)]))
-		ExportToExcel("RapidArc_iX_1", ListOfResultsA, ListOfResultsB)
+		PatientInformation = GetPatientInformation(ListOfResultsA[0])
+		ExportToExcel("RapidArc_iX_1", PatientInformation, ListOfResultsA, ListOfResultsB)
 	print("\n\nANALYSE DYNALOGS iX1 TERMINEE\n\n")
 
 	for i in range(int(len(dynalogFileListR2)/2)):
 		ListOfResultsA = Dynalogs_Leaf_GAP_analyser("RapidArc_iX_2", str(dynalogFileListR2[i]))
 		ListOfResultsB = Dynalogs_Leaf_GAP_analyser("RapidArc_iX_2", str(dynalogFileListR2[i+int(len(dynalogFileListR2)/2)]))
-		ExportToExcel("RapidArc_iX_2", ListOfResultsA, ListOfResultsB)	
+		PatientInformation = GetPatientInformation(ListOfResultsA[0])
+		ExportToExcel("RapidArc_iX_2", PatientInformation, ListOfResultsA, ListOfResultsB)  
 	print("\n\nANALYSE DYNALOGS iX2 TERMINEE\n\n")
 	
 	#### Suppression des fichiers dynalogs analysés ###
@@ -340,21 +356,4 @@ if len(dynalogFileListR1) != 0 or len(dynalogFileListR2) != 0:
 	for file in dynalogFileListR2:
 		shutil.rmtree(file)
 
-	### Annonce des résultats de l'analyse ###
-	Results_Dynalogs_AnalysisA = str(ListOfResultsA[6])
-	Results_Dynalogs_AnalysisB = str(ListOfResultsB[6])
-
-	if Results_Dynalogs_AnalysisA == "Hors tolérance" or Results_Dynalogs_AnalysisB == "Hors tolérance":
-		print("\n\nRESULTATS NON CONFORMES\n\n")
-		MachineName = str(ListOfResultsA[0])
-		if MachineName == "RapidArc_iX_1":
-			os.startfile('\\\\s-grp\\grp\\RADIOPHY\\Contrôle Qualité RTE\\Contrôle Qualité RTE-accélérateurs\\7_CLINAC iX 1\\7-3 CQ -EN\\7-1 CQ_quotidien\\CQ quotidien Dynalog Patients_iX2.xlsm')
-			os.system("pause")
-		else:
-			os.startfile('\\\\s-grp\\grp\\RADIOPHY\\Contrôle Qualité RTE\\Contrôle Qualité RTE-accélérateurs\\10_CLINAC iX 2\\10-3 CQ -EN\\10-1_CQ_quotidien\\CQ quotidien Dynalog Patients_iX1.xlsm')
-			os.system("pause")
-	else:
-		print("\n\nRESULTATS CONFORMES\n\n")
-		os.system("pause")
-
-
+	os.system("pause")
