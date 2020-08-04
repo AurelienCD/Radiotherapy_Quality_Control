@@ -7,6 +7,8 @@ These code allows:
     
     a) For patient treatment (daily) : It analyses the leaf positions, and rise an error if the real position is higher of 1mm to the expected position
     
-    b) For PFROTAT daily test : It analyses the leaf positions, and rise an error if the real position is higher of 0.5mm to the expected position
+    b) For delta4 patient test : It analyses the leaf positions, and rise an error if the real position is higher of 1mm to the expected position
     
-    c) For MLC-Dyn monthly test : It analyses the gantry position, gantry speed and dose rate
+    c) For PFROTAT daily test : It analyses the leaf positions, and rise an error if the real position is higher of 0.5mm to the expected position
+    
+    d) For MLC-Dyn monthly test : It analyses the gantry position, gantry speed and dose rate
