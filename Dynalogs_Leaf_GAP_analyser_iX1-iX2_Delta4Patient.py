@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 
-# Analyse of the GAP between expected and real leaf position in RapidArc (R1-R2) for bench A and B
+# Analyse of the GAP between expected and real leaf position in RapidArc (R1-R2) for bench A and B for Delta4 experiment to allows comparison with the gamma mean and index
 # Author : Aurélien Corroyer-Dulmont
-# Version : 22 march 2020
+# Version : 30 July 2020
 
-# Update 09/03/2020 : all the interesting results are automatically upload to the excel file Alex made. To do that pandas, openpyxl and xlsxwriter are used
+# Update 09/03/2020 : all the interesting results are automatically upload to the excel file. To do that pandas, openpyxl and xlsxwriter are used
 # Update 09/03/2020 : ask for new measurement   
 # Update 12/03/2020 : will look at the folder in "Z:/qualité" and performed automatically the analysis to all the dynalogs files present in the folder, it will also copy all the results in the excel file and activate VBA macro to archive the results
-# Update 22/05/2020 : fit to the new excel files (one per RapidArc), change the theshold value for conformity (based on the previous 6 months results, using mean+1.96SD)
-# Update 04/06/2020 : transfert the dynalog files into the correct folders (the one for patient and the other on for PFRTOAT, will delete others)
 
 import datetime
 import codecs
@@ -32,7 +30,7 @@ def Dynalogs_Leaf_GAP_analyser(RapidName, filepath):
 	IDPatient = filepath[LenghtFilePath-13:LenghtFilePath-4]
 	MachineName = str(RapidName)
 
-	savepath = "Z:/Aurelien_Dynalogs/Results_Analyses_Dynalogs/Patients_traités/Results_iX1_iX2/Dynalogs_analyser_results_ID" + str(IDPatient) + "_" + str(MachineName) + "_" + str(AcquisitionDate[6:]) + str(AcquisitionDate[4:6]) + str(AcquisitionDate[:4]) + ".txt"
+	savepath = "Z:/Aurelien_Dynalogs/Results_Analyses_Dynalogs/DELTA_4/Results_iX1_iX2/Dynalogs_analyser_results_ID" + str(IDPatient) + "_" + str(MachineName) + "_" + str(AcquisitionDate[6:]) + str(AcquisitionDate[4:6]) + str(AcquisitionDate[:4]) + ".txt"
 	
 
 	### Analyse the number of line which is different from dynalog file from an other ###
@@ -52,7 +50,6 @@ def Dynalogs_Leaf_GAP_analyser(RapidName, filepath):
 	
 	file = open(filepath, 'r')
 
-	i = 0
 	for i in range(6):
 		file.readlines(1)   
 		
@@ -61,7 +58,6 @@ def Dynalogs_Leaf_GAP_analyser(RapidName, filepath):
 	RealPosLeaf = []
 	LeafGAP = []
 
-	i = 0
 	j = 0
 	k = 0
 	for i in range(LineCount): #boucle sur l'ensemble du nombre de ligne du fichier dynalog
@@ -268,70 +264,41 @@ def GetPatientInformation(filepath, IDPatient, NumPlan):
 ######### Create Pandas Excel functions to upload the results in the excel data base file ###########
 def ExportToExcel(MachineName, PatientInformation, ListOfResultsA, ListOfResultsB):
 	ListOfResultsToExcel = ListOfResultsA[1:6]+ListOfResultsB[2:6]
-	if MachineName == "RapidArc_iX_1":
-		book = load_workbook('//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/7_CLINAC iX 1/7-3 CQ -EN/7-1 CQ_quotidien/CQ quotidien Dynalog Patients_iX1.xlsm', read_only=False, keep_vba=True)
-		writer = pad.ExcelWriter('//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/7_CLINAC iX 1/7-3 CQ -EN/7-1 CQ_quotidien/CQ quotidien Dynalog Patients_iX1.xlsm', engine='openpyxl') 
-		writer.book = book
-		writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
-		ws = writer.sheets['Dynalog_Patient_iX1']
-		ws["D18"] = int(PatientInformation[0])
-		ws["E18"] = str(PatientInformation[1])
-		ws["F18"] = str(PatientInformation[2])
-		ws["G18"] = str(PatientInformation[3])
-		ws["H18"] = float(PatientInformation[4])
-		ws["I18"] = float(PatientInformation[5])
-		ws["J18"] = str(ListOfResultsToExcel[0])
-		ws["K18"] = float(ListOfResultsToExcel[1])
-		ws["M18"] = str(ListOfResultsToExcel[2])
-		ws["N18"] = float(ListOfResultsToExcel[3])
-		ws["P18"] = float(ListOfResultsToExcel[4])
-		ws["R18"] = float(ListOfResultsToExcel[5])
-		ws["S18"] = str(ListOfResultsToExcel[6])
-		ws["U18"] = float(ListOfResultsToExcel[7])
-		ws["W18"] = float(ListOfResultsToExcel[8])
-		writer.save()
-		xl = win32com.client.Dispatch('Excel.Application')
-		xl.Workbooks.Open(Filename = '//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/7_CLINAC iX 1/7-3 CQ -EN/7-1 CQ_quotidien/CQ quotidien Dynalog Patients_iX1.xlsm', ReadOnly=1)  
-		xl.Worksheets("Dynalog_Patient_iX1").Activate()
-		xl.Application.Run("ArchiverDynalog")
-		xl.Application.Quit()
-		del xl
+	book = load_workbook('Z:/1_CQ Patients/CQ Patients DELTA4 iX1-iX2_Dynalogs.xlsm', read_only=False, keep_vba=True)
+	writer = pad.ExcelWriter('Z:/1_CQ Patients/CQ Patients DELTA4 iX1-iX2_Dynalogs.xlsm', engine='openpyxl') 
+	writer.book = book
+	writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
+	ws = writer.sheets['Dynalogs']
+	ws["D18"] = int(PatientInformation[0])
+	ws["E18"] = str(PatientInformation[1])
+	ws["F18"] = str(PatientInformation[2])
+	ws["G18"] = str(PatientInformation[3])
+	ws["H18"] = float(PatientInformation[4])
+	ws["I18"] = float(PatientInformation[5])
+	ws["J18"] = str(ListOfResultsToExcel[0])
+	ws["K18"] = float(ListOfResultsToExcel[1])
+	ws["M18"] = str(ListOfResultsToExcel[2])
+	ws["N18"] = float(ListOfResultsToExcel[3])
+	ws["P18"] = float(ListOfResultsToExcel[4])
+	ws["R18"] = float(ListOfResultsToExcel[5])
+	ws["S18"] = str(ListOfResultsToExcel[6])
+	ws["U18"] = float(ListOfResultsToExcel[7])
+	ws["W18"] = float(ListOfResultsToExcel[8])
+	writer.save()
+	xl = win32com.client.Dispatch('Excel.Application')
+	xl.Workbooks.Open(Filename = 'Z:/1_CQ Patients/CQ Patients DELTA4 iX1-iX2_Dynalogs.xlsm', ReadOnly=1)  
+	xl.Worksheets("Dynalogs").Activate()
+	xl.Application.Run("ArchiverDynalog")
+	xl.Application.Quit()
+	del xl
 
-	if MachineName == "RapidArc_iX_2":
-		book = load_workbook('//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/10_CLINAC iX 2/10-3 CQ -EN/10-1_CQ_quotidien/CQ quotidien Dynalog Patients_iX2.xlsm', read_only=False, keep_vba=True)
-		writer = pad.ExcelWriter('//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/10_CLINAC iX 2/10-3 CQ -EN/10-1_CQ_quotidien/CQ quotidien Dynalog Patients_iX2.xlsm', engine='openpyxl') 
-		writer.book = book
-		writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
-		ws = writer.sheets['Dynalog_Patient_iX2']
-		ws["D18"] = int(PatientInformation[0])
-		ws["E18"] = str(PatientInformation[1])
-		ws["F18"] = str(PatientInformation[2])
-		ws["G18"] = str(PatientInformation[3])
-		ws["H18"] = float(PatientInformation[4])
-		ws["I18"] = float(PatientInformation[5])
-		ws["J18"] = str(ListOfResultsToExcel[0])
-		ws["K18"] = float(ListOfResultsToExcel[1])
-		ws["M18"] = str(ListOfResultsToExcel[2])
-		ws["N18"] = float(ListOfResultsToExcel[3])
-		ws["P18"] = float(ListOfResultsToExcel[4])
-		ws["R18"] = float(ListOfResultsToExcel[5])
-		ws["S18"] = str(ListOfResultsToExcel[6])
-		ws["U18"] = float(ListOfResultsToExcel[7])
-		ws["W18"] = float(ListOfResultsToExcel[8])
-		writer.save()
-		xl = win32com.client.Dispatch('Excel.Application')
-		xl.Workbooks.Open(Filename = '//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/10_CLINAC iX 2/10-3 CQ -EN/10-1_CQ_quotidien/CQ quotidien Dynalog Patients_iX2.xlsm', ReadOnly=1)  
-		xl.Worksheets("Dynalog_Patient_iX2").Activate()
-		xl.Application.Run("ArchiverDynalog")
-		xl.Application.Quit()
-		del xl
 
 
 
 #########                               12th Mars update                                   ###########
 #########                            loop to analyse all the files in the folder           ###########
 fileListR1 = []
-for f in Path('Z:/Aurelien_Dynalogs/0000_Fichiers_Dynalogs_A_Analyser/Patients_traites/RapidArc_iX1').walkfiles(): 
+for f in Path('Z:/Aurelien_Dynalogs/0000_Fichiers_Dynalogs_A_Analyser/DELTA_4/RapidArc_iX1').walkfiles(): 
 	fileListR1.append(f)
 
 newFileList = []
@@ -343,7 +310,7 @@ for i in range(len(fileListR1)):
 dynalogFileListR1 = lastFileList
 
 fileListR2 = []
-for f in Path('Z:/Aurelien_Dynalogs/0000_Fichiers_Dynalogs_A_Analyser/Patients_traites/RapidArc_iX2').walkfiles(): 
+for f in Path('Z:/Aurelien_Dynalogs/0000_Fichiers_Dynalogs_A_Analyser/DELTA_4/RapidArc_iX2').walkfiles(): 
 	fileListR2.append(f)
 
 newFileList = []
@@ -376,7 +343,7 @@ if len(dynalogFileListR1) != 0 or len(dynalogFileListR2) != 0:
 		ListOfResultsA = Dynalogs_Leaf_GAP_analyser("RapidArc_iX_2", str(dynalogFileListR2[i]))
 		ListOfResultsB = Dynalogs_Leaf_GAP_analyser("RapidArc_iX_2", str(dynalogFileListR2[i+int(len(dynalogFileListR2)/2)]))
 		PatientInformation = GetPatientInformation(dynalogFileListR2[i], ListOfResultsA[0],PlanUID)
-		file = open(dynalogFileListR1[i], 'r')
+		file = open(dynalogFileListR2[i], 'r')
 		file.readlines(3)
 		Line_Plan_Arc = file.readlines(1)
 		PlanUID = int(Line_Plan_Arc[0][-23:-18])
