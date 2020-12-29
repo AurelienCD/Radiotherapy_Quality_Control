@@ -160,7 +160,7 @@ def Dynalogs_Leaf_GAP_analyser(RapidName, filepath):
 	print(u"Le résultat du test est : " + str(ResultLeafGAP.upper()) +"\n\n")
 	print(u"L'ensemble des résultats sont dans le dossier : \n" + str(savepath) +"\n\n")
 	
-	#### Craation and filling of the text file result ###
+	#### Creation and filling of the text file result ###
 	filesave = open(savepath, 'a')
 	filesave = codecs.open(savepath, 'a', encoding='Latin-1')     # Coding to include "é"
 	filesave.write(u"Résultats de l'analyse des Dynalogs")
@@ -221,7 +221,7 @@ def GetPatientInformation(filepath, IDPatient, NumPlan):
 	NumArc = int(Line_Plan_Arc[0][-2:-1])
 	PlanUID = int(Line_Plan_Arc[0][-23:-18])
 
-	df = pad.read_excel('Z:/1_CQ Patients/CQ Patients DELTA4 iX1-iX2.xlsm', sheet_name='DQA PATIENTS iX', usecols="A:D,L,R,S,V,W,Z,AA,AD,AE", nrows=1500, header=3)
+	df = pad.read_excel('Z:/1_CQ Patients/CQ Patients DELTA4 iX1-iX2.xlsm', sheet_name='DQA PATIENTS iX', usecols="A,C:E,M,Q:Z", nrows=1500, header=3)
 	#df = df.dropna()
 
 	df_patient = df.loc[df["ID patient"]==IDPatient,:]
@@ -277,18 +277,15 @@ def ExportToExcel(MachineName, PatientInformation, ListOfResultsA, ListOfResults
 		ws["D18"] = int(PatientInformation[0])
 		ws["E18"] = str(PatientInformation[1])
 		ws["F18"] = str(PatientInformation[2])
-		ws["G18"] = str(PatientInformation[3])
-		ws["H18"] = float(PatientInformation[4])
-		ws["I18"] = float(PatientInformation[5])
-		ws["J18"] = str(ListOfResultsToExcel[0])
-		ws["K18"] = float(ListOfResultsToExcel[1])
-		ws["M18"] = str(ListOfResultsToExcel[2])
-		ws["N18"] = float(ListOfResultsToExcel[3])
-		ws["P18"] = float(ListOfResultsToExcel[4])
-		ws["R18"] = float(ListOfResultsToExcel[5])
-		ws["S18"] = str(ListOfResultsToExcel[6])
-		ws["U18"] = float(ListOfResultsToExcel[7])
-		ws["W18"] = float(ListOfResultsToExcel[8])
+		ws["G18"] = str(ListOfResultsToExcel[0])
+		ws["H18"] = float(ListOfResultsToExcel[1])
+		ws["J18"] = str(ListOfResultsToExcel[2])
+		ws["K18"] = float(ListOfResultsToExcel[3])
+		ws["M18"] = float(ListOfResultsToExcel[4])
+		ws["O18"] = float(ListOfResultsToExcel[5])
+		ws["Q18"] = str(ListOfResultsToExcel[6])
+		ws["R18"] = float(ListOfResultsToExcel[7])
+		ws["T18"] = float(ListOfResultsToExcel[8])
 		writer.save()
 		xl = win32com.client.Dispatch('Excel.Application')
 		xl.Workbooks.Open(Filename = '//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/7_CLINAC iX 1/7-3 CQ -EN/7-1 CQ_quotidien/CQ quotidien Dynalog Patients_iX1.xlsm', ReadOnly=1)  
@@ -306,18 +303,15 @@ def ExportToExcel(MachineName, PatientInformation, ListOfResultsA, ListOfResults
 		ws["D18"] = int(PatientInformation[0])
 		ws["E18"] = str(PatientInformation[1])
 		ws["F18"] = str(PatientInformation[2])
-		ws["G18"] = str(PatientInformation[3])
-		ws["H18"] = float(PatientInformation[4])
-		ws["I18"] = float(PatientInformation[5])
-		ws["J18"] = str(ListOfResultsToExcel[0])
-		ws["K18"] = float(ListOfResultsToExcel[1])
-		ws["M18"] = str(ListOfResultsToExcel[2])
-		ws["N18"] = float(ListOfResultsToExcel[3])
-		ws["P18"] = float(ListOfResultsToExcel[4])
-		ws["R18"] = float(ListOfResultsToExcel[5])
-		ws["S18"] = str(ListOfResultsToExcel[6])
-		ws["U18"] = float(ListOfResultsToExcel[7])
-		ws["W18"] = float(ListOfResultsToExcel[8])
+		ws["G18"] = str(ListOfResultsToExcel[0])
+		ws["H18"] = float(ListOfResultsToExcel[1])
+		ws["J18"] = str(ListOfResultsToExcel[2])
+		ws["K18"] = float(ListOfResultsToExcel[3])
+		ws["M18"] = float(ListOfResultsToExcel[4])
+		ws["O18"] = float(ListOfResultsToExcel[5])
+		ws["Q18"] = str(ListOfResultsToExcel[6])
+		ws["R18"] = float(ListOfResultsToExcel[7])
+		ws["T18"] = float(ListOfResultsToExcel[8])
 		writer.save()
 		xl = win32com.client.Dispatch('Excel.Application')
 		xl.Workbooks.Open(Filename = '//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/10_CLINAC iX 2/10-3 CQ -EN/10-1_CQ_quotidien/CQ quotidien Dynalog Patients_iX2.xlsm', ReadOnly=1)  
@@ -369,6 +363,7 @@ if len(dynalogFileListR1) != 0 or len(dynalogFileListR2) != 0:
 		Line_Plan_Arc = file.readlines(1)
 		PlanUID = int(Line_Plan_Arc[0][-23:-18])
 		ExportToExcel("RapidArc_iX_1", PatientInformation, ListOfResultsA, ListOfResultsB)
+		#os.remove(dynalogFileListR1[i]) #### Suppression des fichiers dynalogs analysés ###
 	print("\n\nANALYSE DYNALOGS iX1 TERMINEE\n\n")
 
 	PlanUID = 0
@@ -376,11 +371,12 @@ if len(dynalogFileListR1) != 0 or len(dynalogFileListR2) != 0:
 		ListOfResultsA = Dynalogs_Leaf_GAP_analyser("RapidArc_iX_2", str(dynalogFileListR2[i]))
 		ListOfResultsB = Dynalogs_Leaf_GAP_analyser("RapidArc_iX_2", str(dynalogFileListR2[i+int(len(dynalogFileListR2)/2)]))
 		PatientInformation = GetPatientInformation(dynalogFileListR2[i], ListOfResultsA[0],PlanUID)
-		file = open(dynalogFileListR1[i], 'r')
+		file = open(dynalogFileListR2[i], 'r')
 		file.readlines(3)
 		Line_Plan_Arc = file.readlines(1)
 		PlanUID = int(Line_Plan_Arc[0][-23:-18])
-		ExportToExcel("RapidArc_iX_2", PatientInformation, ListOfResultsA, ListOfResultsB)  
+		ExportToExcel("RapidArc_iX_2", PatientInformation, ListOfResultsA, ListOfResultsB)
+		#os.remove(dynalogFileListR2[i]) #### Suppression des fichiers dynalogs analysés ###
 	print("\n\nANALYSE DYNALOGS iX2 TERMINEE\n\n")
 	
 	#### Suppression des fichiers dynalogs analysés ###
@@ -388,6 +384,7 @@ if len(dynalogFileListR1) != 0 or len(dynalogFileListR2) != 0:
 		os.remove(file)
 	for file in dynalogFileListR2:
 		os.remove(file)
+
 
 	os.system("pause")
 	
