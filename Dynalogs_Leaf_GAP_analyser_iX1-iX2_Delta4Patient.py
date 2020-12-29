@@ -217,7 +217,7 @@ def GetPatientInformation(filepath, IDPatient, NumPlan):
 	NumArc = int(Line_Plan_Arc[0][-2:-1])
 	PlanUID = int(Line_Plan_Arc[0][-23:-18])
 
-	df = pad.read_excel('Z:/1_CQ Patients/CQ Patients DELTA4 iX1-iX2.xlsm', sheet_name='DQA PATIENTS iX', usecols="A:D,L,R,S,V,W,Z,AA,AD,AE", nrows=1500, header=3)
+	df = pad.read_excel('Z:/1_CQ Patients/CQ Patients DELTA4 iX1-iX2.xlsm', sheet_name='DQA PATIENTS iX', usecols="A,C:E,M,Q:Z", nrows=1500, header=3)
 	#df = df.dropna()
 
 	df_patient = df.loc[df["ID patient"]==IDPatient,:]
@@ -281,7 +281,7 @@ def ExportToExcel(MachineName, PatientInformation, ListOfResultsA, ListOfResults
 	ws["N18"] = float(ListOfResultsToExcel[3])
 	ws["P18"] = float(ListOfResultsToExcel[4])
 	ws["R18"] = float(ListOfResultsToExcel[5])
-	ws["S18"] = str(ListOfResultsToExcel[6])
+	ws["T18"] = str(ListOfResultsToExcel[6])
 	ws["U18"] = float(ListOfResultsToExcel[7])
 	ws["W18"] = float(ListOfResultsToExcel[8])
 	writer.save()
