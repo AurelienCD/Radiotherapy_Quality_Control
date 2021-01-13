@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+
+# Analyse txt file from matrix for matrix profil to send to excel file
+# Author : Aurélien Corroyer-Dulmont
+# Version : 01 January 2021
+
 
 from tkinter import *
 from tkinter.filedialog import askdirectory
@@ -12,9 +18,6 @@ import win32com.client
 from path import Path
 import shutil
 import os
-
-
-## attention à bien nommé les fichiers avec le colliO et non pas coll0
 
 
 
@@ -80,21 +83,23 @@ def Main(machineName, dateCQ):
 
 
 def FileFinder(machineName, dateCQ):
-	date = datetime.datetime.now()
-	year = date.year
+	#date = datetime.datetime.now()
+	#year = date.year
+	annee = str(dateCQ)
+	annee = annee[:4]
 	fileList = []
 
 	if machineName == "Artiste":
-		for f in Path('//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/0_ARTISTE/0-3_CQ-EN/0-3_CQ_mensuel/0-2 CQ_faisceaux/FICHIERS MatriXX/Profils Photons MATRIXX/' + str(year)).walkfiles(): 
+		for f in Path('//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/0_ARTISTE/0-3_CQ-EN/0-3_CQ_mensuel/0-2 CQ_faisceaux/FICHIERS MatriXX/Profils Photons MATRIXX/' + str(annee)).walkfiles(): 
 			fileList.append(f)
 	if machineName == "Clinac":
-		for f in Path('//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/2_CLINAC/2-3 CQ -EN/2-3 CQ_mensuel/2-2 CQ_faisceaux/FICHIERS MatriXX/Profils Photons MATRIXX/' + str(year)).walkfiles(): 
+		for f in Path('//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/2_CLINAC/2-3 CQ -EN/2-3 CQ_mensuel/2-2 CQ_faisceaux/FICHIERS MatriXX/Profils Photons MATRIXX/' + str(annee)).walkfiles(): 
 			fileList.append(f)
 	if machineName == "RapidArc_iX_1":
-		for f in Path('//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/7_CLINAC iX 1/7-3 CQ -EN/7-3 CQ_mensuel/FICHIERS MatriXX/Profils Photons MATRIXX/' + str(year)).walkfiles(): 
+		for f in Path('//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/7_CLINAC iX 1/7-3 CQ -EN/7-3 CQ_mensuel/FICHIERS MatriXX/Profils Photons MATRIXX/' + str(annee)).walkfiles(): 
 			fileList.append(f)
 	if machineName == "RapidArc_iX_2":
-		for f in Path('//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/10_CLINAC iX 2/10-3 CQ -EN/10-3_CQ_mensuel/FICHIERS MatriXX/Profils Photons MATRIXX/' + str(year)).walkfiles(): 
+		for f in Path('//s-grp/grp/RADIOPHY/Contrôle Qualité RTE/Contrôle Qualité RTE-accélérateurs/10_CLINAC iX 2/10-3 CQ -EN/10-3_CQ_mensuel/FICHIERS MatriXX/Profils Photons MATRIXX/' + str(annee)).walkfiles(): 
 			fileList.append(f)	
 
 	newFileList = []
